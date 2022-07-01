@@ -230,7 +230,7 @@ def read_cpts(coordinate, radius):
     headers = {'accept': 'application/xml',
                'content-type': 'application/json'}
 
-    a = requests.post("https://publiek.broservices.nl/sr/cpt-v1.1/characteristics/searches", data=json.dumps(Schemas),
+    a = requests.post("https://publiek.broservices.nl/sr/cpt/v1/characteristics/searches", data=json.dumps(Schemas),
                       headers=headers)
     # print(a.status_code)
     # print(a.content)
@@ -249,7 +249,7 @@ def read_cpts(coordinate, radius):
     cpts = []
     for c in cpt_ID:
         # print(f"{i} of {len(cpt_ID)}")
-        cpt = requests.get(f"https://publiek.broservices.nl/sr/cpt-v1.1/objects/{c}")
+        cpt = requests.get(f"https://publiek.broservices.nl/sr/cpt/v1/objects/{c}")
 
         # todo parse cpt
         cpts.append(parse_bro_xml(cpt.content))
