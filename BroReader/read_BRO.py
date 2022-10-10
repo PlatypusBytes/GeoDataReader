@@ -9,25 +9,14 @@ import logging
 from io import StringIO
 import numpy as np
 import pandas as pd
+from xml.dom import minidom
 
-
-# @dataclass
-# class ReadCPT:
-#     bro_ids = int
-#     cpt_class = float
-#
-#
-#     def get_index(self):
-#
-#         return
-#
-#
-#     def get_cpt_by_index(self):
-#         return
-#
-#     def parse_cpt(self):
-#         return
-
+from geolib_plus.bro_xml_cpt import BroXmlCpt
+from pathlib import Path
+from geolib_plus.robertson_cpt_interpretation import RobertsonCptInterpretation
+from geolib_plus.robertson_cpt_interpretation import UnitWeightMethod
+from geolib_plus.robertson_cpt_interpretation import OCRMethod
+from geolib_plus.robertson_cpt_interpretation import ShearWaveVelocityMethod
 
 ns = "{http://www.broservices.nl/xsd/cptcommon/1.1}"
 ns2 = "{http://www.broservices.nl/xsd/dscpt/1.1}"
@@ -39,11 +28,13 @@ nodata = -999999
 to_epsg = "28992"
 to_srs = pyproj.Proj(init='epsg:{}'.format(to_epsg))
 
-
-columns = ["penetrationLength", "depth", "elapsedTime", "coneResistance", "correctedConeResistance", "netConeResistance", "magneticFieldStrengthX", "magneticFieldStrengthY", "magneticFieldStrengthZ", "magneticFieldStrengthTotal", "electricalConductivity",
-           "inclinationEW", "inclinationNS", "inclinationX", "inclinationY", "inclinationResultant", "magneticInclination", "magneticDeclination", "localFriction", "poreRatio", "temperature", "porePressureU1", "porePressureU2", "porePressureU3", "frictionRatio"]
+columns = ["penetrationLength", "depth", "elapsedTime", "coneResistance", "correctedConeResistance",
+           "netConeResistance", "magneticFieldStrengthX", "magneticFieldStrengthY", "magneticFieldStrengthZ",
+           "magneticFieldStrengthTotal", "electricalConductivity",
+           "inclinationEW", "inclinationNS", "inclinationX", "inclinationY", "inclinationResultant",
+           "magneticInclination", "magneticDeclination", "localFriction", "poreRatio", "temperature", "porePressureU1",
+           "porePressureU2", "porePressureU3", "frictionRatio"]
 req_columns = ["penetrationLength", "coneResistance", "localFriction", "frictionRatio"]
-
 
 
 def convert_lat_long_to_rd(x, y):
@@ -109,7 +100,7 @@ def parse_bro_xml(xml):
             "offset_z": None, "predrilled_z": None, "a": 0.80,
             "vertical_datum": None, "local_reference": None,
             "quality_class": None, "cone_penetrometer_type": None,
-            "cpt_standard": None}# 'result_time': None}
+            "cpt_standard": None}  # 'result_time': None}
 
     # Location
     x, y = parse_xml_location(xml)
@@ -203,12 +194,11 @@ def parse_bro_xml(xml):
     return data
 
 
-def read_cpts(coordinate, radius):
-
+def read_cpts(coordinate, radius, start_date=date(2015, 1, 1)):
     # latitude, longitude = convert_lat_long_to_rd(150010, 449999)
     latitude, longitude = convert_lat_long_to_rd(float(coordinate[0]), float(coordinate[1]))
-    radius = radius # km
-    start_date = date(2015, 1, 1)
+    radius = radius  # km
+    start_date = start_date
     end_date = date.today()
 
     Schemas = {
@@ -230,7 +220,7 @@ def read_cpts(coordinate, radius):
     headers = {'accept': 'application/xml',
                'content-type': 'application/json'}
 
-    a = requests.post("https://publiek.broservices.nl/sr/cpt-v1.1/characteristics/searches", data=json.dumps(Schemas),
+    a = requests.post("https://publiek.broservices.nl/sr/cpt/v1/characteristics/searches", data=json.dumps(Schemas),
                       headers=headers)
     # print(a.status_code)
     # print(a.content)
@@ -249,9 +239,46 @@ def read_cpts(coordinate, radius):
     cpts = []
     for c in cpt_ID:
         # print(f"{i} of {len(cpt_ID)}")
-        cpt = requests.get(f"https://publiek.broservices.nl/sr/cpt-v1.1/objects/{c}")
+        cpt = requests.get(f"https://publiek.broservices.nl/sr/cpt/v1/objects/{c}")
+        try:
+            xml = minidom.parseString(cpt.content)
+        except:
+            continue
+        xml.writexml(open(c + ".xml", 'w'),
+                     indent="  ",
+                     addindent="  ",
+                     newl='\n',
+                     encoding='UTF-8',
+                     standalone="yes")
 
-        # todo parse cpt
-        cpts.append(parse_bro_xml(cpt.content))
+        xml.unlink()
+        print(f"Wrote {c}.xml")
+        try:
+            cpt_file_xml = Path(f"{c}.xml")
+            cpt_xml = BroXmlCpt()
+            cpt_xml.read(cpt_file_xml)
+            if cpt_xml.coordinates == None:
+                continue
+            cpt_xml.pre_process_data()
 
+            # do pre-processing
+            interpreter = RobertsonCptInterpretation()
+            interpreter.unitweightmethod = UnitWeightMethod.LENGKEEK
+            interpreter.shearwavevelocitymethod = ShearWaveVelocityMethod.ZANG
+            interpreter.ocrmethod = OCRMethod.MAYNE
+            cpt_xml.interpret_cpt(interpreter)
+            cpts.append(dict(cpt_xml))
+            out_file = open(f"{c}.json", "w")
+            cpt_dict = dict(cpt_xml)
+            for k, v in cpt_dict.items():
+                if "array" in str(type(v)):
+                    cpt_dict[k] = v.tolist()
+                if "numpy.float32" in str(type(v)) or "numpy.float64" in str(type(v)):
+                    cpt_dict[k] = float(v)
+            cpt_dict.pop("plot_settings")
+            json.dump(cpt_dict, out_file, indent=2)
+        except ValueError:
+            print(f"{c} is not readable")
+        except UnboundLocalError:
+            print(f"{c} is not readable")
     return cpts
