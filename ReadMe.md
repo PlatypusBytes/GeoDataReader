@@ -16,5 +16,6 @@ default start date is 1/1/2015
         file = open('cpts', 'wb')
         # dump information to that file
         pickle.dump(c, file)
+        file.close()
  
     
