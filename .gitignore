@@ -1,0 +1,8 @@
+# VS code
+.vscode/
+# JetBrains
+.idea/
+# virtual env
+venv/
+# package build
+build/
