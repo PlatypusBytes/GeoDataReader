@@ -1,3 +1,4 @@
+import os
 import json
 import requests
 import pyproj
@@ -194,7 +195,10 @@ def parse_bro_xml(xml):
     return data
 
 
-def read_cpts(coordinate, radius, start_date=date(2015, 1, 1)):
+def read_cpts(coordinate, radius, start_date=date(2015, 1, 1), output_dir="./"):
+    # check if output directory exists
+    if not os.path.isdir(output_dir):
+        os.mkdir(output_dir)
     # latitude, longitude = convert_lat_long_to_rd(150010, 449999)
     latitude, longitude = convert_lat_long_to_rd(float(coordinate[0]), float(coordinate[1]))
     radius = radius  # km
@@ -244,7 +248,7 @@ def read_cpts(coordinate, radius, start_date=date(2015, 1, 1)):
             xml = minidom.parseString(cpt.content)
         except:
             continue
-        xml.writexml(open(c + ".xml", 'w'),
+        xml.writexml(open(os.path.join(output_dir ,c + ".xml"), 'w'),
                      indent="  ",
                      addindent="  ",
                      newl='\n',
@@ -254,7 +258,8 @@ def read_cpts(coordinate, radius, start_date=date(2015, 1, 1)):
         xml.unlink()
         print(f"Wrote {c}.xml")
         try:
-            cpt_file_xml = Path(f"{c}.xml")
+
+            cpt_file_xml = Path(f"{os.path.join(output_dir, c+'.xml')}")
             cpt_xml = BroXmlCpt()
             cpt_xml.read(cpt_file_xml)
             if cpt_xml.coordinates == None:
@@ -268,7 +273,7 @@ def read_cpts(coordinate, radius, start_date=date(2015, 1, 1)):
             interpreter.ocrmethod = OCRMethod.MAYNE
             cpt_xml.interpret_cpt(interpreter)
             cpts.append(dict(cpt_xml))
-            out_file = open(f"{c}.json", "w")
+            out_file = open(os.path.join(output_dir ,c + ".json"), "w")
             cpt_dict = dict(cpt_xml)
             for k, v in cpt_dict.items():
                 if "array" in str(type(v)):
