@@ -6,3 +6,7 @@
 venv/
 # package build
 build/
+
+*.pyc
+__pycache__/
+*.egg-info/

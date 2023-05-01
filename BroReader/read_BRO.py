@@ -258,7 +258,6 @@ def read_cpts(coordinate, radius, start_date=date(2015, 1, 1), output_dir="./"):
         xml.unlink()
         print(f"Wrote {c}.xml")
         try:
-
             cpt_file_xml = Path(f"{os.path.join(output_dir, c+'.xml')}")
             cpt_xml = BroXmlCpt()
             cpt_xml.read(cpt_file_xml)
