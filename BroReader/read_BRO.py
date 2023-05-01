@@ -224,13 +224,13 @@ def read_cpts(coordinate, radius, start_date=date(2015, 1, 1), output_dir="./"):
     headers = {'accept': 'application/xml',
                'content-type': 'application/json'}
 
-    a = requests.post("https://publiek.broservices.nl/sr/cpt/v1/characteristics/searches", data=json.dumps(Schemas),
-                      headers=headers)
-    # print(a.status_code)
-    # print(a.content)
+    message = requests.post("https://publiek.broservices.nl/sr/cpt/v1/characteristics/searches", data=json.dumps(Schemas),
+                            headers=headers)
+    # print(message.status_code)
+    # print(message.content)
 
     # collect all BRO-ID
-    root = ElementTree.fromstring(a.content)
+    root = ElementTree.fromstring(message.content)
 
     # read CPT IC
     cpt_ID = []
@@ -253,7 +253,7 @@ def read_cpts(coordinate, radius, start_date=date(2015, 1, 1), output_dir="./"):
                      addindent="  ",
                      newl='\n',
                      encoding='UTF-8',
-                     standalone="yes")
+                     )
 
         xml.unlink()
         print(f"Wrote {c}.xml")
