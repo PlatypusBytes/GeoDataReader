@@ -1,3 +1,5 @@
+![Tests](https://github.com/StemVibrations/STEM/actions/workflows/tests.yml/badge.svg)
+
 # Bro Reader Package
 
 Use the following code snippet use the package. Note that the distance for the radius is given in kilometers. And the
