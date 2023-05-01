@@ -45,7 +45,6 @@ def compare_dictionaries(dic1, dic2):
     skip_keys = ["E_NEN", "cohesion_NEN", "fr_angle_NEN", "plot_settings"]
 
     for key in dic1.keys():
-        print(key)
         if key in skip_keys:
             continue
         if key not in dic2.keys():
