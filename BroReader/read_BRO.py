@@ -195,7 +195,7 @@ def parse_bro_xml(xml):
     return data
 
 
-def read_cpts(coordinate, radius, start_date=date(2015, 1, 1), output_dir="./"):
+def read_cpts(coordinate, radius, start_date=date(2015, 1, 1), output_dir="./", interpret_cpt=False):
     # check if output directory exists
     if not os.path.isdir(output_dir):
         os.mkdir(output_dir)
@@ -263,14 +263,15 @@ def read_cpts(coordinate, radius, start_date=date(2015, 1, 1), output_dir="./"):
             cpt_xml.read(cpt_file_xml)
             if cpt_xml.coordinates == None:
                 continue
-            cpt_xml.pre_process_data()
+            if interpret_cpt:
+                cpt_xml.pre_process_data()
 
-            # do pre-processing
-            interpreter = RobertsonCptInterpretation()
-            interpreter.unitweightmethod = UnitWeightMethod.LENGKEEK
-            interpreter.shearwavevelocitymethod = ShearWaveVelocityMethod.ZANG
-            interpreter.ocrmethod = OCRMethod.MAYNE
-            cpt_xml.interpret_cpt(interpreter)
+                # do pre-processing
+                interpreter = RobertsonCptInterpretation()
+                interpreter.unitweightmethod = UnitWeightMethod.LENGKEEK
+                interpreter.shearwavevelocitymethod = ShearWaveVelocityMethod.ZANG
+                interpreter.ocrmethod = OCRMethod.MAYNE
+                cpt_xml.interpret_cpt(interpreter)
             cpts.append(dict(cpt_xml))
             out_file = open(os.path.join(output_dir ,c + ".json"), "w")
             cpt_dict = dict(cpt_xml)

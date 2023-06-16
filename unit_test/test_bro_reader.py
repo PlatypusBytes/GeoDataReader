@@ -10,18 +10,18 @@ TOL = 1e-3
 def test_len_cpts():
     location = [117769, 439304]
     radius_distance = 0.2
-    cpts = read_BRO.read_cpts(location, radius_distance, output_dir="cpts")
+    cpts = read_BRO.read_cpts(location, radius_distance, output_dir="cpts", interpret_cpt=True)
     shutil.rmtree("cpts")
     assert len(cpts) == 4
 
     radius_distance = 0.4
-    cpts = read_BRO.read_cpts(location, radius_distance, output_dir="cpts")
+    cpts = read_BRO.read_cpts(location, radius_distance, output_dir="cpts", interpret_cpt=True)
     shutil.rmtree("cpts")
     assert len(cpts) == 35
 
     radius_distance = 0.4
     start_date = date(2018, 1, 1)
-    cpts = read_BRO.read_cpts(location, radius_distance, start_date=start_date,output_dir="cpts")
+    cpts = read_BRO.read_cpts(location, radius_distance, start_date=start_date,output_dir="cpts", interpret_cpt=True)
     shutil.rmtree("cpts")
     assert len(cpts) == 10
 
@@ -29,7 +29,7 @@ def test_len_cpts():
 def test_read_cpts():
     location = [117776, 439124]
     radius_distance = 0.02
-    cpts = read_BRO.read_cpts(location, radius_distance, output_dir="cpts")
+    cpts = read_BRO.read_cpts(location, radius_distance, output_dir="cpts", interpret_cpt=True)
     shutil.rmtree("cpts")
     data = cpts[0]
 
