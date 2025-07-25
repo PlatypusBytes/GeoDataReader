@@ -23,7 +23,7 @@ dependencies = [
     "lxml>=4.9.2",
     "numpy>=1.24.1",
     "pandas>=1.5.3",
-    "GEOLib-Plus @ git+https://github.com/Deltares/GEOLib-Plus.git",
+    "d-geolib-plus @ git+https://github.com/Deltares/GEOLib-Plus.git",
 ]
 
 [project.optional-dependencies]
