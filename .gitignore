@@ -4,10 +4,26 @@
 .idea/
 # virtual env
 venv/
+.venv/
+env/
+.env/
 # package build
 build/
+dist/
 
+# Python
 *.pyc
 __pycache__/
 *.egg-info/
 .tox/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Output directories
+cpts/
+*.pickle
