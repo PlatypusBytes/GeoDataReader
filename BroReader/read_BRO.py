@@ -195,7 +195,11 @@ def parse_bro_xml(xml):
     return data
 
 
-def read_cpts(coordinate, radius, start_date=date(2015, 1, 1), output_dir="./", interpret_cpt=False):
+def read_cpts(coordinate,
+              radius,
+              start_date=date(2015, 1, 1),
+              end_date=date.today(),
+              output_dir="./", interpret_cpt=False):
     # check if output directory exists
     if not os.path.isdir(output_dir):
         os.mkdir(output_dir)
@@ -203,7 +207,7 @@ def read_cpts(coordinate, radius, start_date=date(2015, 1, 1), output_dir="./", 
     latitude, longitude = convert_lat_long_to_rd(float(coordinate[0]), float(coordinate[1]))
     radius = radius  # km
     start_date = start_date
-    end_date = date.today()
+    end_date = end_date
 
     Schemas = {
         "registrationPeriod": {
