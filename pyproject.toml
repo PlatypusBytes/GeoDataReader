@@ -1,4 +1,48 @@
-# pyproject.toml
 [build-system]
-requires = ["setuptools", "wheel"]
+requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "geodatareader"
+version = "1.1"
+authors = [
+    {name = "Eleni Smyrniou", email = "eleni.smyrniou@deltares.nl"},
+    {name = "Bruno Zuada Coelho", email = "bruno.zuadacoelho@deltares.nl"},
+]
+description = "A python toolbox to download and read geotechnical data including CPTs from the BRO based on a radius distance."
+readme = "ReadMe.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "requests>=2.28.2",
+    "pyproj>=3.4.1",
+    "lxml>=4.9.2",
+    "numpy>=1.24.1",
+    "pandas>=1.5.3",
+]
+
+[project.optional-dependencies]
+full = ["geolib_plus @ git+https://github.com/Deltares/GEOLib-Plus.git"]
+test = ["pytest>=7.3.1"]
+dev = [
+    "pytest>=7.3.1",
+    "tox>=3.8.0",
+    "black",
+    "flake8",
+]
+
+[project.urls]
+Homepage = "https://github.com/PlatypusBytes/GeoDataReader"
+Repository = "https://github.com/PlatypusBytes/GeoDataReader"
+Issues = "https://github.com/PlatypusBytes/GeoDataReader/issues"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+# If you want to specify which packages to include, add:
+# include = ["BroReader*", "AhnReader*"]
