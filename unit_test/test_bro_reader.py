@@ -2,7 +2,7 @@ import pickle
 import shutil
 import numpy as np
 from datetime import date
-from BroReader import read_BRO
+from geodatareader.BroReader import read_BRO
 
 
 TOL = 1e-3
